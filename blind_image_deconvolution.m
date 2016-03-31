@@ -17,8 +17,8 @@ clear
 % N = size(C,2);
 
 %x = rgb2gray(im2double(imread('images/new/shapes.png')));
-x = zeros(20,20);
-x(8:12, 8:12) = ones(5,5);
+x = ones(10,10);
+x(3:6, 4:7) = zeros(4,4);
 [s1, s2] = size(x);
 x = x(:);
 
@@ -33,14 +33,23 @@ K = size(B,2);
 [ C, S, N, m_gt ] = get_subspace( y, L, mat ); %change y to x for original image
 
 %% Set up matrices in Fourier domain
-B_hat = fft(full(B)); %fft doesn't take sparse input
-C_hat = fft(full(C));
-y_hat = fft(y);
+% B_hat = fft(full(B)); %fft doesn't take sparse input
+% C_hat = fft(full(C));
+% y_hat = fft(y);
+B_hat = full(B);
+C_hat = full(C);
+y_hat = full(y);
 
 %% Define linear operator A
+% A = zeros(L,K*N); %This if C_hat, B_hat, y_hat are in Fourier domain
+% for i=1:size(C_hat,2)
+%     Del = diag(sqrt(L)*C_hat(:,i));
+%     A(:,(i-1)*K+1:i*K) = Del * B_hat;
+% end
+
 A = zeros(L,K*N);
 for i=1:size(C_hat,2)
-    Del = diag(sqrt(L)*C_hat(:,i));
+    Del = circular(C(:,i));
     A(:,(i-1)*K+1:i*K) = Del * B_hat;
 end
 
@@ -52,3 +61,15 @@ cvx_begin
     subject to
     A*X(:) == y_hat
 cvx_end
+
+%% Recover m and h from X
+% Überarbeiten.....
+
+m_1 = m_gt(1);
+
+[ h_opt, m_opt ] = recov_m_h( X, m_1, h_gt );
+
+C_dec = C*m_opt;
+x_dec = waverec2(C_dec, S, 'haar');
+figure
+imshow(x_dec)

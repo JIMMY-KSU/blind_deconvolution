@@ -8,32 +8,32 @@ function [ C, S, N, m ] = get_subspace( x, L, mat )
 %           groundtruth vector m (compare to paper for notation)
 X = mat(x);
 
-[C_haar,S] =  wavedec2(X, 2, 'haar');
+[C_haar,S] =  wavedec2(X, 1, 'haar');
 
-Ind = abs(C_haar) > 1.0e-1;
-N = sum(Ind);
-C = sparse(L,N);
-m = zeros(N,1);
-j=1;
-for i=1:length(C_haar)
-    if(Ind(i))
-        C(i,j) = 1;
-        m(j) = C_haar(i);
-        j=j+1;
-    end
-end
-
-% N = sum(boolean(C_haar));
+% Ind = abs(C_haar) > 1.0e-1;% Das sollte besser gewählt werden.....
+% N = sum(Ind);
 % C = sparse(L,N);
 % m = zeros(N,1);
 % j=1;
 % for i=1:length(C_haar)
-%     if(C_haar)
+%     if(Ind(i))
 %         C(i,j) = 1;
 %         m(j) = C_haar(i);
 %         j=j+1;
 %     end
 % end
+
+N = sum(boolean(C_haar));
+C = sparse(L,N);
+m = zeros(N,1);
+j=1;
+for i=1:length(C_haar)
+    if(C_haar(i))
+        C(i,j) = 1;
+        m(j) = C_haar(i);
+        j=j+1;
+    end
+end
 
 end
 

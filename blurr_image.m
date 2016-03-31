@@ -11,15 +11,17 @@ function [ y, B, w, h ] = blurr_image( x, mat )
     [s1,s2] = size(X);
     
     % Generate blurring kernel w
-    blur_kern = fspecial('motion', 15,35);
+    blur_kern = fspecial('motion', 5,15);
     [sb1, sb2] = size(blur_kern);
     w = zeros(size(X)); % w needs same size as x
     w(s1/2-(sb1+1)/2+1:s1/2+(sb1+1)/2-1, s2/2-(sb2+1)/2+1:s2/2+(sb2+1)/2-1) = blur_kern; %Change if any of the values is odd.
     
-    % Convolute the image.
+    % Convolute the image. 
     Y = ifft2(fft2(X).*fft2(w));
     Y = fftshift(Y);
     y = Y(:);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Maybe problem with the convolution
     
     % Compute the subspace of w
     w = w(:);
